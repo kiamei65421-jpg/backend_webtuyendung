@@ -1,16 +1,12 @@
 {
   "name": "webtuyendungepu",
   "version": "1.0.0",
-  "main": "app.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./dist/app.js",
-    "dev": "nodemon --watch src --ext ts --exec ts-node src/app.ts"
+    "start": "node ./dist/server.js",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "@types/cors": "^2.8.19",
     "bcryptjs": "^3.0.2",
