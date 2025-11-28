@@ -1,54 +1,57 @@
-import fs from "fs";
-import path from "path";
-import cloudinary from "../config/cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+import streamifier from "streamifier";
 
-// Upload 1 ảnh
-export const uploadImage = async (
-  filePath: string,
+// =========================
+// UPLOAD 1 FILE (BUFFER)
+// =========================
+export const uploadImage = (
+  buffer: Buffer,
   folder: string = "uploads"
 ): Promise<{ public_id: string; secure_url: string }> => {
-  try {
-    const result = await cloudinary.uploader.upload(filePath, {
-      folder,
-      resource_type: "image",
-    });
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "image" },
+      (error, result) => {
+        if (error || !result) {
+          console.error("Cloudinary upload error:", error);
+          reject(new Error("Upload failed"));
+        } else {
+          resolve({
+            public_id: result.public_id,
+            secure_url: result.secure_url,
+          });
+        }
+      }
+    );
 
-    // Xoá file local sau khi upload xong
-    // console.log("Deleting local file:", filePath);
-    fs.unlinkSync(path.resolve(filePath));
-
-    return {
-      public_id: result.public_id,
-      secure_url: result.secure_url,
-    };
-  } catch (error) {
-    console.error("Upload error:", error);
-    throw new Error("Upload image failed");
-  }
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
 };
 
-// Upload nhiều ảnh
+// =========================
+// UPLOAD MULTIPLE FILES
+// =========================
 export const uploadMultipleImages = async (
-  filePaths: string[],
+  buffers: Buffer[],
   folder: string = "uploads"
 ): Promise<{ public_id: string; secure_url: string }[]> => {
-  const uploads: { public_id: string; secure_url: string }[] = [];
-
-  for (const filePath of filePaths) {
-    const uploaded = await uploadImage(filePath, folder);
-    uploads.push(uploaded);
+  const uploadedFiles: { public_id: string; secure_url: string }[] = [];
+  for (const buffer of buffers) {
+    const uploaded = await uploadImage(buffer, folder);
+    uploadedFiles.push(uploaded);
   }
-
-  return uploads;
+  return uploadedFiles;
 };
 
-// Xoá ảnh trên Cloudinary
+// =========================
+// DELETE FILE
+// =========================
 export const deleteImage = async (publicId: string): Promise<boolean> => {
   try {
     await cloudinary.uploader.destroy(publicId);
     return true;
   } catch (error) {
-    console.error("Delete error:", error);
+    console.error("Cloudinary delete error:", error);
     return false;
   }
 };

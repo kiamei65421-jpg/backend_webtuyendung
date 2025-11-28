@@ -16,13 +16,27 @@ const app = express();
 // ============ Middlewares ============
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+].filter(Boolean) as string[];
+
+// CORS
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // domain FE
-    credentials: true, // cho phép gửi cookie
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log("❌ Blocked by CORS:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
   })
 );
-
 // ============ Database ============
 connectDB();
 
