@@ -67,12 +67,10 @@ export const register = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Register error:", error);
-    return res
-      .status(500)
-      .json({
-        message: "Lỗi server khi đăng ký thế mới ảo",
-        error: error.message,
-      });
+    return res.status(500).json({
+      message: "Lỗi server khi đăng ký thế mới ảo",
+      error: error.message,
+    });
   }
 };
 
@@ -151,7 +149,7 @@ export const logout = async (req: Request, res: Response) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
     });
 
     return res.status(200).json({ message: "Đăng xuất thành công!" });

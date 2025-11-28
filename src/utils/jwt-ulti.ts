@@ -17,10 +17,10 @@ export const createAccessToken = (payload: JwtPayload) => {
 // Gửi token vào cookie an toàn
 export const sendTokenAsCookie = (res: Response, token: string) => {
   res.cookie("token", token, {
-    httpOnly: true, // không cho JS phía client đọc
-    secure: process.env.NODE_ENV === "production", // chỉ HTTPS nếu production
-    sameSite: "strict",
-    maxAge: 24 * 60 * 60 * 1000, // 1 ngày
+    httpOnly: true,
+    secure: true, // 🔥 BẮT BUỘC nếu dùng https + domain khác
+    sameSite: "none", // 🔥 BẮT BUỘC để cookie gửi sang domain khác
+    maxAge: 24 * 60 * 60 * 1000,
   });
 };
 
