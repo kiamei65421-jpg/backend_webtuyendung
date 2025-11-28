@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from "cloudinary";
 import streamifier from "streamifier";
+import cloudinary from "../config/cloudinary";
 
 // =========================
 // UPLOAD 1 FILE (BUFFER)
